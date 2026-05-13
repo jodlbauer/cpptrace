@@ -1,5 +1,11 @@
 project('cpptrace', 'cpp')
 
+flags = [
+    '-DCPPTRACE_DEMANGLE_WITH_CXXABI',
+    '-DCPPTRACE_UNWIND_WITH_NOTHING',
+    '-DCPPTRACE_GET_SYMBOLS_WITH_LIBDL',
+]
+
 cpptrace_lib = library(
     'cpptrace',
     'src/unwind/unwind_with_libunwind.cpp',
@@ -47,7 +53,7 @@ cpptrace_lib = library(
     'src/demangle/demangle_with_cxxabi.cpp',
     'src/demangle/demangle_with_winapi.cpp',
     'src/demangle/demangle_with_nothing.cpp',
-    cpp_args : ['-DCPPTRACE_DEMANGLE_WITH_CXXABI', '-DCPPTRACE_UNWIND_WITH_NOTHING'],
+    cpp_args : flags,
     include_directories : ['include', 'src'],
     build_by_default : true,
     install : true,
@@ -60,9 +66,10 @@ install_subdir(
 )
 
 pkg = import('pkgconfig')
-pkg.generate(cpptrace_lib)
+pkg.generate(cpptrace_lib, extra_cflags : flags)
 
 cpptrace_dep = declare_dependency(
     include_directories : 'include',
     link_with : cpptrace_lib,
+    compile_args : flags,
 )
